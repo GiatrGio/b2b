@@ -1,0 +1,327 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────────────────────────────────────
+// Auth & Users
+// ──────────────────────────────────────────────
+
+enum Role {
+  BUYER
+  SUPPLIER
+  ADMIN
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  emailVerified  DateTime?
+  passwordHash   String
+  name           String?
+  image          String?
+  role           Role
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Auth.js required
+  accounts Account[]
+  sessions Session[]
+
+  // Profile relations
+  supplierProfile SupplierProfile?
+  buyerProfile    BuyerProfile?
+
+  // Activity
+  reviews   Review[]
+  favorites Favorite[]
+  orders    Order[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ──────────────────────────────────────────────
+// Profiles
+// ──────────────────────────────────────────────
+
+model SupplierProfile {
+  id           String  @id @default(cuid())
+  userId       String  @unique
+  businessName String
+  description  String?
+  logo         String?
+  phone        String?
+  website      String?
+  address      String?
+  city         String?
+  region       String?
+  postalCode   String?
+  latitude     Float?
+  longitude    Float?
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products     Product[]
+  orderGroups  OrderGroup[]
+  reviews      Review[]       @relation("SupplierReviews")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("supplier_profiles")
+}
+
+model BuyerProfile {
+  id              String  @id @default(cuid())
+  userId          String  @unique
+  businessName    String
+  businessType    String?  // e.g., "restaurant", "bar", "cafe"
+  phone           String?
+  deliveryAddress String?
+  city            String?
+  region          String?
+  postalCode      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("buyer_profiles")
+}
+
+// ──────────────────────────────────────────────
+// Catalog
+// ──────────────────────────────────────────────
+
+model Category {
+  id       String  @id @default(cuid())
+  nameEn   String
+  nameEl   String
+  slug     String  @unique
+  icon     String?
+  sortOrder Int    @default(0)
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  supplierId  String
+  categoryId  String
+  title       String
+  titleEl     String?
+  description String?
+  descriptionEl String?
+  images      String[]  // Array of storage URLs
+  video       String?   // Optional video URL
+  isActive    Boolean @default(true)
+
+  supplier  SupplierProfile @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  category  Category        @relation(fields: [categoryId], references: [id])
+  variants  ProductVariant[]
+  reviews   Review[]        @relation("ProductReviews")
+  favorites Favorite[]
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([supplierId])
+  @@index([categoryId])
+  @@map("products")
+}
+
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  label     String  // e.g., "500ml Glass Bottle", "Case of 6"
+  labelEl   String?
+  sku       String?
+  price     Decimal @db.Decimal(10, 2)
+  stock     Int     @default(0)
+  isActive  Boolean @default(true)
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+// ──────────────────────────────────────────────
+// Orders
+// ──────────────────────────────────────────────
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  buyerId         String
+  status          OrderStatus @default(PENDING)
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  deliveryAddress String?
+  deliveryCity    String?
+  deliveryRegion  String?
+  deliveryPostalCode String?
+  notes           String?
+
+  buyer       User         @relation(fields: [buyerId], references: [id])
+  orderGroups OrderGroup[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([buyerId])
+  @@map("orders")
+}
+
+model OrderGroup {
+  id         String      @id @default(cuid())
+  orderId    String
+  supplierId String
+  status     OrderStatus @default(CONFIRMED)
+  subtotal   Decimal     @db.Decimal(10, 2)
+
+  order    Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  supplier SupplierProfile @relation(fields: [supplierId], references: [id])
+  items    OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([supplierId])
+  @@map("order_groups")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderGroupId String
+  productId    String
+  variantId    String
+  quantity     Int
+  unitPrice    Decimal @db.Decimal(10, 2)
+
+  orderGroup OrderGroup     @relation(fields: [orderGroupId], references: [id], onDelete: Cascade)
+  product    Product        @relation(fields: [productId], references: [id])
+  variant    ProductVariant @relation(fields: [variantId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([orderGroupId])
+  @@map("order_items")
+}
+
+// ──────────────────────────────────────────────
+// Reviews & Favorites
+// ──────────────────────────────────────────────
+
+enum ReviewTargetType {
+  PRODUCT
+  SUPPLIER
+}
+
+model Review {
+  id         String           @id @default(cuid())
+  authorId   String
+  targetType ReviewTargetType
+  rating     Int              // 1-5
+  comment    String?
+
+  // Polymorphic: one of these will be set
+  productId  String?
+  supplierId String?
+
+  author   User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  product  Product?         @relation("ProductReviews", fields: [productId], references: [id], onDelete: Cascade)
+  supplier SupplierProfile? @relation("SupplierReviews", fields: [supplierId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([supplierId])
+  @@index([authorId])
+  @@map("reviews")
+}
+
+enum FavoriteTargetType {
+  PRODUCT
+  SUPPLIER
+}
+
+model Favorite {
+  id         String             @id @default(cuid())
+  userId     String
+  targetType FavoriteTargetType
+  productId  String?
+  supplierId String?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, targetType, productId])
+  @@unique([userId, targetType, supplierId])
+  @@index([userId])
+  @@map("favorites")
+}

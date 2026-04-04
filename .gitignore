@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+
+# Next.js
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Prisma generated
+/src/generated/prisma
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+npm-debug.log*
+node_modules/
+.next/
+out/
+.env
+.env.local
+.env.*.local

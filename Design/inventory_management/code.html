@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Inventory Management | Mediterranean B2B</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#a3c9ff",
+                        "surface-variant": "#e1e3e4",
+                        "on-surface": "#191c1d",
+                        "secondary-fixed": "#d2eca2",
+                        "outline-variant": "#c2c6d1",
+                        "background": "#f8f9fa",
+                        "on-surface-variant": "#424750",
+                        "on-background": "#191c1d",
+                        "surface-bright": "#f8f9fa",
+                        "primary": "#003461",
+                        "tertiary-fixed": "#dfe4d9",
+                        "on-primary-fixed-variant": "#004882",
+                        "on-secondary-container": "#546a2e",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#d3e4ff",
+                        "inverse-surface": "#2e3132",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#c3c8be",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d9dadb",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-fixed-dim": "#b6d088",
+                        "primary-container": "#004b87",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#8abcff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary-fixed-variant": "#434840",
+                        "tertiary": "#2f352d",
+                        "error-container": "#ffdad6",
+                        "surface": "#f8f9fa",
+                        "outline": "#727781",
+                        "on-primary-fixed": "#001c38",
+                        "on-tertiary-container": "#b5bbb1",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary-container": "#464b43",
+                        "primary-fixed-dim": "#a3c9ff",
+                        "secondary-container": "#cfe99f",
+                        "on-secondary-fixed-variant": "#394d14",
+                        "surface-tint": "#27609d",
+                        "secondary": "#50652a",
+                        "on-tertiary-fixed": "#181d16",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "on-secondary-fixed": "#131f00"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .glass-panel {
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-screen flex flex-col docked left-0 h-full w-64 bg-slate-100 dark:bg-slate-900 border-none z-50">
+<div class="px-6 py-8">
+<h1 class="text-xl font-bold text-sky-900 dark:text-sky-100 font-manrope">Mediterranean B2B</h1>
+<p class="font-inter text-sm text-slate-500 mt-1">Verified Supplier</p>
+</div>
+<nav class="flex-1 space-y-1 px-2">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-sky-700 dark:hover:text-sky-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-inter text-sm">Sales Dashboard</span>
+</a>
+<!-- Active State for Inventory -->
+<a class="flex items-center gap-3 px-4 py-3 text-sky-900 dark:text-sky-100 font-semibold border-r-4 border-sky-900 dark:border-sky-400 bg-white dark:bg-slate-800 translate-x-1 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-inter text-sm">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-sky-700 dark:hover:text-sky-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-inter text-sm">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-sky-700 dark:hover:text-sky-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-inter text-sm">Settings</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-3 px-4 rounded-xl text-sm font-semibold shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="sync">sync</span>
+                Quick Reorder
+            </button>
+<div class="mt-4 border-t border-slate-200 dark:border-slate-800 pt-4">
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 text-sm hover:text-sky-700 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                    Help Center
+                </a>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 left-64 z-40 flex justify-between items-center px-8 h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm dark:shadow-none">
+<div class="flex items-center gap-4">
+<span class="text-lg font-black uppercase text-sky-900 dark:text-sky-50 font-manrope tracking-tight">Supplier Portal</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-outline">
+<span class="material-symbols-outlined text-sm" data-icon="search">search</span>
+</span>
+<input class="bg-surface-container-high border-none rounded-sm pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-2 focus:ring-primary/40 focus:bg-surface-container-highest transition-all" placeholder="Search Inventory..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-primary">
+<button class="hover:text-sky-600 transition-all scale-95 active:scale-100">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden">
+<img alt="Supplier Brand Logo" class="w-full h-full object-cover" data-alt="close-up profile avatar of a professional mediterranean male supplier in business casual attire with olive grove background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXhXXgs8frpok1NwEo2zxQ56HnXdjpkfT_MzFgkzullEYcWCLRB-Gljelym_ERtTSiqCad_xcJZ3aWYSl7KiHSPtAA3t0sZVSIC76ml2zB2YbBdvEDl8a6cgoy5VDtGCys-NIQCKpWKQTJEuFmbMbcWKe56Hk8OWUVJn8bsFTScVDPRnm04b2cNTYtJmKFzh8YNpbpNJDN7ngDWspnQC6ktRykWMfrVqsjjVkbnpeLT8f1fOEyEwbQkMF3gmK4WxlMydmEs1x7eA"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-20 pb-12 px-8 min-h-screen">
+<!-- Dashboard Header & Top Actions -->
+<div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+<div>
+<nav class="flex items-center gap-2 text-xs font-medium text-on-surface-variant mb-2">
+<span class="hover:text-primary cursor-pointer">Catalog</span>
+<span class="material-symbols-outlined text-[10px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary">Stock Management</span>
+</nav>
+<h2 class="text-3xl font-extrabold text-primary tracking-tight font-headline">Inventory</h2>
+<p class="text-on-surface-variant mt-1">Manage 432 product units across 12 categories.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-surface-container-highest text-primary px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="upload_file">upload_file</span>
+                    Bulk Upload
+                </button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg shadow-primary/10 hover:shadow-xl hover:translate-y-[-1px] transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+                    Add New Product
+                </button>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+<div class="bg-surface-container-low p-1 rounded-full flex gap-1 col-span-3">
+<button class="px-6 py-2 rounded-full text-xs font-bold bg-white text-primary shadow-sm">All Products</button>
+<button class="px-6 py-2 rounded-full text-xs font-medium text-on-surface-variant hover:bg-white/50 transition-colors">Olive Oil</button>
+<button class="px-6 py-2 rounded-full text-xs font-medium text-on-surface-variant hover:bg-white/50 transition-colors">Herbs &amp; Spices</button>
+<button class="px-6 py-2 rounded-full text-xs font-medium text-on-surface-variant hover:bg-white/50 transition-colors">Wines</button>
+<button class="px-6 py-2 rounded-full text-xs font-medium text-on-surface-variant hover:bg-white/50 transition-colors">Vinegars</button>
+</div>
+<div class="flex items-center justify-end">
+<button class="flex items-center gap-2 text-primary font-semibold text-sm px-4 py-2 hover:bg-primary/5 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="filter_list">filter_list</span>
+                    Advanced Filters
+                </button>
+</div>
+</div>
+<!-- Inventory Order Engine -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-semibold text-xs uppercase tracking-wider">
+<th class="px-6 py-4">Product Name</th>
+<th class="px-6 py-4">SKU</th>
+<th class="px-6 py-4">Category</th>
+<th class="px-6 py-4">Price</th>
+<th class="px-6 py-4">Stock Level</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="text-sm font-body">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-5 flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden shrink-0">
+<img alt="Olive Oil Bottle" class="w-full h-full object-cover" data-alt="aesthetic close-up of a premium artisanal olive oil glass bottle with minimalist white label sitting on a rustic stone surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDelblOCs4gUEAoV0T-dKKTzCuLso3dezexEVSxrlsJ8gZ1y4sFvGbDjFDZvoV9hs_IAxa_WXmZtQBtqBq3iCTRgl7E3zKvLm_2OJ7DRaDOwSdUeE-1DXbQlz84Oy5zFnhV1Y7-YmyF1zZmXZ0SJ9Ddg72SmtfHPvJsyDI_isEUQymczlu8ABb40NzwqDewa5yr2nIty8H9EnqgmL8fQtoEVhHCm3IZCcFNKlA4TzJ_5HhpiLpEGtDYfmvv_fSYiz0KeEw6Y_1oQw"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">Koroneiki Extra Virgin</p>
+<p class="text-xs text-on-surface-variant">750ml Premium Glass</p>
+</div>
+</td>
+<td class="px-6 py-5 text-on-surface-variant font-mono text-xs">GR-KOR-750</td>
+<td class="px-6 py-5">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight">Olive Oil</span>
+</td>
+<td class="px-6 py-5 font-bold text-primary">€18.50</td>
+<td class="px-6 py-5">
+<div class="w-full max-w-[100px] h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 85%"></div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-1 block">342 Units</span>
+</td>
+<td class="px-6 py-5">
+<span class="flex items-center gap-1.5 text-secondary font-semibold">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                    In Stock
+                                </span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-primary hover:bg-primary/5 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 (Zebra) -->
+<tr class="bg-surface-container-low/40 hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-5 flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden shrink-0">
+<img alt="Organic Oregano" class="w-full h-full object-cover" data-alt="macro photograph of dried organic mediterranean oregano leaves on a wooden spoon with soft focus background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOHL4Xqb0jC4PAHllGswAAZigmx3t5WYawLjKLwfprz7onvhdB2fEit2bvIHW1KkX485UfC3lsQPVRhOui7V4sXMSMxKBMJ9o4UDmkJ1TAYmoOJyQRyEEsqbc-dGtdt6hHy5639RzalbjVC85Rkt2AiK01AAwFO9_dz4lk49V61FPk_Hddk1_IurXBXqORuQtRqa9_LgwyLdUCyMGN2WHuenxbdqey17ROeB8h8BKc_QHZh0LqeG92YJqMS1jaG7NTDxyGQn97vw"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">Wild Mt. Taygetos Oregano</p>
+<p class="text-xs text-on-surface-variant">500g Bulk Pouch</p>
+</div>
+</td>
+<td class="px-6 py-5 text-on-surface-variant font-mono text-xs">GR-ORG-500</td>
+<td class="px-6 py-5">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight">Herbs</span>
+</td>
+<td class="px-6 py-5 font-bold text-primary">€12.20</td>
+<td class="px-6 py-5">
+<div class="w-full max-w-[100px] h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 15%"></div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-1 block">12 Units</span>
+</td>
+<td class="px-6 py-5">
+<span class="flex items-center gap-1.5 text-primary-container font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+                                    Low Stock
+                                </span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-primary hover:bg-primary/5 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-5 flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden shrink-0">
+<img alt="Red Wine" class="w-full h-full object-cover" data-alt="deep red wine being poured into a crystal glass in a dim winery cellar with warm ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQTytbJVuTGJCteGrRi7OxShHmZyhbIPbVjxhFI4MYoY90qQRf3ZhKoOLx0SI9AXJ8513nsC5vHfyKryyBXAMqAIfo9TOmsKnQrK8fPK7NrOp5NC-0zyxxA1j6Q9tzGpxjjZfqiZJd1xS44GImGEBhUE1pOLIfL16aKlJntUNTcZ6zJl-evnwlw_qrZLDIyJ93Rg0JfGWfpyz2T3LijxJfClQsGMTLqp0IFkQdZIWUWwDBJ-jgZDZUbhIHKve7WXwpgX2Y3ZZ8DQ"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">Agiorgitiko Nemea Reserve</p>
+<p class="text-xs text-on-surface-variant">2018 Vintage, 750ml</p>
+</div>
+</td>
+<td class="px-6 py-5 text-on-surface-variant font-mono text-xs">GR-AGR-2018</td>
+<td class="px-6 py-5">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight">Wines</span>
+</td>
+<td class="px-6 py-5 font-bold text-primary">€42.00</td>
+<td class="px-6 py-5">
+<div class="w-full max-w-[100px] h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="bg-error h-full" style="width: 0%"></div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-1 block">0 Units</span>
+</td>
+<td class="px-6 py-5">
+<span class="flex items-center gap-1.5 text-error font-semibold">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+                                    Out of Stock
+                                </span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-primary hover:bg-primary/5 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-surface-container-low/40 hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-5 flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden shrink-0">
+<img alt="Balsamic Vinegar" class="w-full h-full object-cover" data-alt="aged balsamic vinegar bottle with wax seal on a dark wooden background, fine dining presentation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2T-hQwkCOd5udZOgMF7vYElgiJe4DVZyYd9cjyAOuJeJ7T10IlsorwFQTIi9RSJUjM82aeslh1PI6R-AaR30S7BnjEntPeOKUzfLrFHy85fsaV2srTjgP3WI8L6hk9S43z8mKPm1iL2Mf95V1zC2HiJzTGfiwD5YNK1BPVHYMSnttCkCNW0H-64pXoSUmEwNS-8gJW6ZGOoqV2bLsNuTDWrZZwq9Nkgf5hM0v3o6I-Z0XeEjlnwKqyfVB2ENzWqpliSG4ntGxkQ"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">Aged Balsamic of Modena</p>
+<p class="text-xs text-on-surface-variant">12-Year Reserve, 250ml</p>
+</div>
+</td>
+<td class="px-6 py-5 text-on-surface-variant font-mono text-xs">IT-BAL-12YR</td>
+<td class="px-6 py-5">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight">Vinegars</span>
+</td>
+<td class="px-6 py-5 font-bold text-primary">€34.90</td>
+<td class="px-6 py-5">
+<div class="w-full max-w-[100px] h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 55%"></div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-1 block">156 Units</span>
+</td>
+<td class="px-6 py-5">
+<span class="flex items-center gap-1.5 text-secondary font-semibold">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                    In Stock
+                                </span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-primary hover:bg-primary/5 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Footer of Table -->
+<div class="px-6 py-4 flex items-center justify-between border-t border-surface-container-high bg-white">
+<p class="text-xs text-on-surface-variant">Showing <span class="font-bold text-on-surface">1 - 4</span> of <span class="font-bold text-on-surface">432</span> products</p>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center border border-outline-variant text-on-surface-variant hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center bg-primary text-white text-xs font-bold">1</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant text-xs hover:bg-surface-container-low">2</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant text-xs hover:bg-surface-container-low">3</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center border border-outline-variant text-on-surface-variant hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Secondary Insights / Metrics Asymmetric Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-12">
+<div class="lg:col-span-2 bg-gradient-to-br from-white to-surface-container-low p-6 rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline font-bold text-primary">Storage Efficiency</h3>
+<span class="material-symbols-outlined text-primary" data-icon="monitoring">monitoring</span>
+</div>
+<div class="flex items-center gap-8">
+<div class="relative w-24 h-24 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-high" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-secondary" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="60" stroke-width="8"></circle>
+</svg>
+<span class="absolute font-headline font-extrabold text-lg">76%</span>
+</div>
+<div>
+<p class="text-sm text-on-surface-variant leading-relaxed">Your cold-press olive oil stock is moving <span class="font-bold text-secondary">24% faster</span> than last quarter. We recommend increasing the base reorder point for these SKUs by 15 units.</p>
+<button class="mt-3 text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                            View velocity report <span class="material-symbols-outlined text-xs" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-xl border border-white/50 flex flex-col justify-between">
+<div>
+<h3 class="font-headline font-bold text-primary mb-1">Restock Alerts</h3>
+<p class="text-xs text-on-surface-variant">4 items require immediate attention.</p>
+</div>
+<div class="space-y-3 my-4">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="text-xs font-medium">Saffron Threads (Bulk)</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<span class="text-xs font-medium">Mastic Gum Resin</span>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-container-highest text-primary font-bold text-xs rounded-lg hover:bg-surface-container-high transition-colors">
+                    Review All Alerts
+                </button>
+</div>
+</div>
+</main>
+<!-- Floating Order Summary (Glassmorphism FAB-style) -->
+<div class="fixed bottom-8 right-8 z-50 glass-panel border border-white/40 shadow-2xl rounded-2xl p-4 flex items-center gap-6 max-w-sm">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-white bg-primary flex items-center justify-center text-white text-xs font-bold">12</div>
+<div class="w-10 h-10 rounded-full border-2 border-white bg-secondary flex items-center justify-center text-white text-xs font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="pending">pending</span>
+</div>
+</div>
+<div class="pr-4 border-r border-outline-variant/30">
+<p class="text-[10px] uppercase font-bold text-on-surface-variant">Active Quotes</p>
+<p class="font-headline font-extrabold text-primary">€14,203.00</p>
+</div>
+<button class="bg-primary text-white p-2 rounded-lg hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</button>
+</div>
+</body></html>
