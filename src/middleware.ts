@@ -2,7 +2,7 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
-import { auth } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -30,10 +30,16 @@ export default async function middleware(request: NextRequest) {
     return intlResponse;
   }
 
-  // Check auth using Auth.js session
-  const session = await auth();
+  // Check auth using JWT — Auth.js v5 uses "authjs.session-token" cookie
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+    cookieName: process.env.NODE_ENV === "production"
+      ? "__Secure-authjs.session-token"
+      : "authjs.session-token",
+  });
 
-  if (!session?.user) {
+  if (!token) {
     const locale = pathname.match(/^\/(en|el)/)?.[1] || "en";
     const loginUrl = new URL(`/${locale}/login`, request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
@@ -41,7 +47,7 @@ export default async function middleware(request: NextRequest) {
   }
 
   // Role-based route protection
-  const role = session.user.role as string;
+  const role = token.role as string;
 
   if (pathWithoutLocale.startsWith("/supplier") && role !== "SUPPLIER") {
     const locale = pathname.match(/^\/(en|el)/)?.[1] || "en";
