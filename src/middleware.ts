@@ -31,7 +31,7 @@ export default async function middleware(request: NextRequest) {
   }
 
   // Check auth using JWT (works in Edge runtime)
-  const token = await getToken({ req: request });
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
   if (!token) {
     const locale = pathname.match(/^\/(en|el)/)?.[1] || "en";
