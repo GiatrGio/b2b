@@ -2,7 +2,7 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/lib/auth";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -30,10 +30,10 @@ export default async function middleware(request: NextRequest) {
     return intlResponse;
   }
 
-  // Check auth using JWT (works in Edge runtime)
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  // Check auth using Auth.js session
+  const session = await auth();
 
-  if (!token) {
+  if (!session?.user) {
     const locale = pathname.match(/^\/(en|el)/)?.[1] || "en";
     const loginUrl = new URL(`/${locale}/login`, request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
@@ -41,7 +41,7 @@ export default async function middleware(request: NextRequest) {
   }
 
   // Role-based route protection
-  const role = token.role as string;
+  const role = session.user.role as string;
 
   if (pathWithoutLocale.startsWith("/supplier") && role !== "SUPPLIER") {
     const locale = pathname.match(/^\/(en|el)/)?.[1] || "en";
