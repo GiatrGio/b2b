@@ -20,11 +20,10 @@
     "register": "Register"
   },
   "categories": {
-    "produce": "Produce",
-    "beverages": "Beverages",
-    "dairy": "Dairy",
-    "meatSeafood": "Meat & Seafood",
-    "dryGoods": "Dry Goods"
+    "freshProducts": "Fresh Products",
+    "frozenProducts": "Frozen Products",
+    "dryGoods": "Dry Goods",
+    "beverages": "Beverages"
   },
   "auth": {
     "login": "Log in",
@@ -175,7 +174,12 @@
       "slug": "Slug",
       "icon": "Icon",
       "sortOrder": "Sort Order",
-      "confirmDelete": "Are you sure you want to delete this category?"
+      "confirmDelete": "Are you sure you want to delete this category?",
+      "addSubcategory": "Add Subcategory",
+      "editSubcategory": "Edit Subcategory",
+      "subcategories": "Subcategories",
+      "parentCategory": "Parent Category",
+      "mainCategories": "Main Categories"
     }
   },
   "common": {

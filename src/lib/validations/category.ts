@@ -6,6 +6,7 @@ export const createCategorySchema = z.object({
   slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
   icon: z.string().optional(),
   sortOrder: z.number().int().default(0),
+  parentId: z.string().optional().nullable(),
 });
 
 export const updateCategorySchema = createCategorySchema.partial();

@@ -20,11 +20,10 @@
     "register": "Εγγραφή"
   },
   "categories": {
-    "produce": "Φρούτα & Λαχανικά",
-    "beverages": "Ποτά",
-    "dairy": "Γαλακτοκομικά",
-    "meatSeafood": "Κρέας & Θαλασσινά",
-    "dryGoods": "Ξηρά Τρόφιμα"
+    "freshProducts": "Νωπά Προϊόντα",
+    "frozenProducts": "Κατεψυγμένα Προϊόντα",
+    "dryGoods": "Ξηρά Τρόφιμα",
+    "beverages": "Ποτά"
   },
   "auth": {
     "login": "Σύνδεση",
@@ -175,7 +174,12 @@
       "slug": "Slug",
       "icon": "Εικονίδιο",
       "sortOrder": "Σειρά Ταξινόμησης",
-      "confirmDelete": "Είστε σίγουροι ότι θέλετε να διαγράψετε αυτήν την κατηγορία;"
+      "confirmDelete": "Είστε σίγουροι ότι θέλετε να διαγράψετε αυτήν την κατηγορία;",
+      "addSubcategory": "Προσθήκη Υποκατηγορίας",
+      "editSubcategory": "Επεξεργασία Υποκατηγορίας",
+      "subcategories": "Υποκατηγορίες",
+      "parentCategory": "Γονική Κατηγορία",
+      "mainCategories": "Κύριες Κατηγορίες"
     }
   },
   "common": {

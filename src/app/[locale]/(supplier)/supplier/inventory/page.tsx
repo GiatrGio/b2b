@@ -43,6 +43,8 @@ interface Category {
   nameEn: string;
   nameEl: string;
   slug: string;
+  parentId?: string | null;
+  parent?: { id: string; nameEn: string } | null;
 }
 
 const emptyVariant: Variant = {
@@ -91,8 +93,10 @@ export default function InventoryPage() {
   }, [page, selectedCategory]);
 
   const fetchCategories = useCallback(async () => {
-    const res = await fetch("/api/categories");
-    setCategories(await res.json());
+    const res = await fetch("/api/categories?flat=true");
+    const all = await res.json();
+    // Only show subcategories (with parentId) for product assignment
+    setCategories(all.filter((c: Category) => c.parentId));
   }, []);
 
   useEffect(() => {
@@ -453,7 +457,7 @@ export default function InventoryPage() {
                 <option value="">Select category...</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
-                    {cat.nameEn}
+                    {cat.parent ? `${cat.parent.nameEn} → ` : ""}{cat.nameEn}
                   </option>
                 ))}
               </select>

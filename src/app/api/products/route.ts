@@ -12,10 +12,22 @@ export async function GET(request: NextRequest) {
   const limit = parseInt(searchParams.get("limit") || "20");
   const skip = (page - 1) * limit;
 
+  const parentCategoryId = searchParams.get("parentCategoryId");
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { isActive: true };
 
-  if (categoryId) where.categoryId = categoryId;
+  if (categoryId) {
+    where.categoryId = categoryId;
+  } else if (parentCategoryId) {
+    // Get all products under a main category (across all its subcategories)
+    const subcategories = await prisma.category.findMany({
+      where: { parentId: parentCategoryId },
+      select: { id: true },
+    });
+    const subcategoryIds = subcategories.map((c) => c.id);
+    where.categoryId = { in: subcategoryIds };
+  }
   if (supplierId) where.supplierId = supplierId;
   if (search) {
     where.OR = [

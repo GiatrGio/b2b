@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useCartStore } from "@/stores/cart-store";
 import { Link } from "@/i18n/routing";
 import { Search, Minus, Plus, ShoppingCart } from "lucide-react";
@@ -15,14 +15,31 @@ interface Variant {
   stock: number;
 }
 
+interface Category {
+  id: string;
+  nameEn: string;
+  nameEl: string;
+  slug: string;
+}
+
 interface Product {
   id: string;
   title: string;
   description: string | null;
   images: string[];
   variants: Variant[];
+  category: Category;
   supplier: { id: string; businessName: string; logo: string | null };
   _count: { reviews: number };
+  createdAt: string;
+}
+
+interface MainCategory {
+  id: string;
+  nameEn: string;
+  nameEl: string;
+  slug: string;
+  children: Category[];
 }
 
 export default function CategoryPage({
@@ -33,37 +50,65 @@ export default function CategoryPage({
   const { slug } = use(params);
   const t = useTranslations("buyer.catalog");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const addItem = useCartStore((s) => s.addItem);
+
+  const [mainCategory, setMainCategory] = useState<MainCategory | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [categories, setCategories] = useState<Array<{ id: string; slug: string; nameEn: string }>>([]);
 
+  const getName = (cat: { nameEn: string; nameEl: string }) =>
+    locale === "el" ? cat.nameEl : cat.nameEn;
+
+  // Fetch main categories to find the one matching this slug
   useEffect(() => {
     fetch("/api/categories")
       .then((r) => r.json())
-      .then(setCategories);
-  }, []);
+      .then((cats: MainCategory[]) => {
+        const found = cats.find((c) => c.slug === slug);
+        if (found) setMainCategory(found);
+        setLoading(false);
+      });
+  }, [slug]);
 
+  // Fetch products for this main category
   useEffect(() => {
-    const cat = categories.find((c) => c.slug === slug);
-    if (!cat) {
-      if (categories.length > 0) setLoading(false);
-      return;
-    }
+    if (!mainCategory) return;
 
-    const params = new URLSearchParams({ categoryId: cat.id });
+    const params = new URLSearchParams({ parentCategoryId: mainCategory.id });
     if (search) params.set("search", search);
+    if (selectedSubcategory) {
+      params.delete("parentCategoryId");
+      params.set("categoryId", selectedSubcategory);
+    }
+    params.set("limit", "50");
+
     fetch(`/api/products?${params}`)
       .then((r) => r.json())
       .then((data) => {
         setProducts(data.products || []);
-        setLoading(false);
       });
-  }, [slug, search, categories]);
+  }, [mainCategory, search, selectedSubcategory]);
 
-  const categoryName = categories.find((c) => c.slug === slug)?.nameEn || slug;
+  // Fetch new arrivals (latest 4 products in this category)
+  useEffect(() => {
+    if (!mainCategory) return;
+
+    const params = new URLSearchParams({
+      parentCategoryId: mainCategory.id,
+      limit: "4",
+    });
+
+    fetch(`/api/products?${params}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setNewArrivals(data.products || []);
+      });
+  }, [mainCategory]);
 
   const handleAddToCart = (product: Product, variant: Variant) => {
     const qty = quantities[variant.id] || 1;
@@ -83,88 +128,210 @@ export default function CategoryPage({
     setQuantities((prev) => ({ ...prev, [variant.id]: 0 }));
   };
 
+  if (loading) {
+    return <p className="text-on-surface-variant p-8">{tc("loading")}</p>;
+  }
+
+  if (!mainCategory) {
+    return (
+      <div className="bg-surface-lowest rounded-xl p-8 text-center shadow-aegean">
+        <p className="text-on-surface-variant">{tc("noResults")}</p>
+      </div>
+    );
+  }
+
+  const categoryName = getName(mainCategory);
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="font-heading text-3xl font-bold">{categoryName}</h1>
-      </div>
-
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant" />
-        <input
-          type="text"
-          placeholder={t("searchPlaceholder")}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full h-10 pl-9 pr-3 text-sm bg-surface-lowest ghost-border rounded-lg focus:ghost-border-focus focus:outline-none"
-        />
-      </div>
-
-      {loading ? (
-        <p className="text-on-surface-variant">{tc("loading")}</p>
-      ) : products.length === 0 ? (
-        <div className="bg-surface-lowest rounded-xl p-8 text-center shadow-aegean">
-          <p className="text-on-surface-variant">{tc("noResults")}</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-surface-lowest rounded-xl p-5 shadow-aegean"
+    <div className="space-y-8">
+      {/* New Arrivals Section */}
+      {newArrivals.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-heading text-2xl font-bold">New Arrivals</h2>
+            <Link
+              href="/cart"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white btn-gradient rounded-xl"
             >
-              <div className="flex gap-4">
-                {product.images[0] ? (
-                  <Image
-                    src={product.images[0]}
-                    alt={product.title}
-                    width={96}
-                    height={96}
-                    className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-24 h-24 bg-surface-high rounded-lg flex-shrink-0" />
-                )}
-                <div className="flex-1">
-                  <Link
-                    href={`/suppliers/${product.supplier.id}`}
-                    className="text-xs text-aegean hover:underline"
-                  >
-                    {product.supplier.businessName}
-                  </Link>
-                  <h3 className="font-semibold mt-1">{product.title}</h3>
-                  {product.description && (
-                    <p className="text-sm text-on-surface-variant mt-1 line-clamp-2">
+              Quick Reorder <span aria-hidden>&#8594;</span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {newArrivals.map((product) => {
+              const cheapestVariant = product.variants[0];
+              return (
+                <div
+                  key={product.id}
+                  className="bg-surface-lowest rounded-xl overflow-hidden shadow-aegean group"
+                >
+                  <div className="relative h-40 bg-surface-high">
+                    {product.images[0] ? (
+                      <Image
+                        src={product.images[0]}
+                        alt={product.title}
+                        fill
+                        className="object-cover rounded-t-xl"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-on-surface-variant/30">
+                        <ShoppingCart className="h-10 w-10" />
+                      </div>
+                    )}
+                    {product.category && (
+                      <span className="absolute top-2 left-2 px-2 py-1 text-[10px] font-semibold text-white bg-aegean rounded">
+                        {getName(product.category)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <p className="font-medium text-sm line-clamp-1">{product.title}</p>
+                    <p className="text-xs text-on-surface-variant mt-0.5 line-clamp-1">
                       {product.description}
                     </p>
-                  )}
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="font-semibold text-aegean">
+                        &euro;{cheapestVariant ? parseFloat(cheapestVariant.price).toFixed(2) : "—"}
+                      </span>
+                      {cheapestVariant && cheapestVariant.stock > 0 && (
+                        <button
+                          onClick={() => handleAddToCart(product, cheapestVariant)}
+                          className="p-1.5 rounded-lg btn-gradient text-white"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
-                  <div className="mt-3 space-y-2">
+      {/* Categories & Inventory Section */}
+      <section>
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="font-heading text-xl font-semibold flex items-center gap-2">
+            <span className="text-on-surface-variant">&#9776;</span> Categories
+          </h2>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Subcategory Sidebar */}
+          <div className="lg:w-56 flex-shrink-0">
+            <div className="space-y-1">
+              <button
+                onClick={() => setSelectedSubcategory(null)}
+                className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                  selectedSubcategory === null
+                    ? "bg-aegean text-white font-medium"
+                    : "text-on-surface hover:bg-surface-low"
+                }`}
+              >
+                All {categoryName}
+              </button>
+              {mainCategory.children.map((sub) => (
+                <button
+                  key={sub.id}
+                  onClick={() => setSelectedSubcategory(sub.id)}
+                  className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
+                    selectedSubcategory === sub.id
+                      ? "bg-aegean text-white font-medium"
+                      : "text-on-surface hover:bg-surface-low"
+                  }`}
+                >
+                  {getName(sub)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Product List */}
+          <div className="flex-1">
+            {/* Search */}
+            <div className="relative max-w-md mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant" />
+              <input
+                type="text"
+                placeholder={t("searchPlaceholder")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full h-10 pl-9 pr-3 text-sm bg-surface-lowest ghost-border rounded-lg focus:ghost-border-focus focus:outline-none"
+              />
+            </div>
+
+            {/* Product Table */}
+            {products.length === 0 ? (
+              <div className="bg-surface-lowest rounded-xl p-8 text-center shadow-aegean">
+                <p className="text-on-surface-variant">{tc("noResults")}</p>
+              </div>
+            ) : (
+              <div className="bg-surface-lowest rounded-xl shadow-aegean overflow-hidden">
+                {/* Table Header */}
+                <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-3 text-xs font-semibold text-on-surface-variant uppercase tracking-wide border-b border-border">
+                  <div className="col-span-4">Product Details</div>
+                  <div className="col-span-2">Category</div>
+                  <div className="col-span-2">Unit/Case</div>
+                  <div className="col-span-2">Price</div>
+                  <div className="col-span-2"></div>
+                </div>
+
+                {/* Product Rows */}
+                {products.map((product) => (
+                  <div key={product.id} className="border-b border-border last:border-b-0">
                     {product.variants.map((variant) => (
                       <div
                         key={variant.id}
-                        className="flex items-center justify-between gap-2 py-1"
+                        className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center px-5 py-4 hover:bg-surface-low/50 transition-colors"
                       >
-                        <span className="text-sm">{variant.label}</span>
-                        <div className="flex items-center gap-3">
+                        {/* Product Details */}
+                        <div className="col-span-4 flex items-center gap-3">
+                          {product.images[0] ? (
+                            <Image
+                              src={product.images[0]}
+                              alt={product.title}
+                              width={48}
+                              height={48}
+                              className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-surface-high rounded-lg flex-shrink-0" />
+                          )}
+                          <div>
+                            <p className="font-medium text-sm">{product.title}</p>
+                            <Link
+                              href={`/suppliers/${product.supplier.id}`}
+                              className="text-xs text-aegean hover:underline"
+                            >
+                              {product.supplier.businessName}
+                            </Link>
+                          </div>
+                        </div>
+
+                        {/* Category Badge */}
+                        <div className="col-span-2">
+                          <span className="px-2 py-1 text-xs font-medium bg-surface-low rounded text-on-surface-variant">
+                            {getName(product.category)}
+                          </span>
+                        </div>
+
+                        {/* Unit/Case */}
+                        <div className="col-span-2 text-sm text-on-surface-variant">
+                          {variant.label}
+                        </div>
+
+                        {/* Price */}
+                        <div className="col-span-2">
                           <span className="font-semibold text-aegean">
                             &euro;{parseFloat(variant.price).toFixed(2)}
                           </span>
-                          <span
-                            className={`text-xs ${
-                              variant.stock === 0
-                                ? "text-red-600"
-                                : variant.stock < 15
-                                ? "text-amber-600"
-                                : "text-olive"
-                            }`}
-                          >
-                            {variant.stock === 0
-                              ? t("outOfStock")
-                              : `${variant.stock} units`}
-                          </span>
-                          {variant.stock > 0 && (
-                            <div className="flex items-center gap-1">
+                        </div>
+
+                        {/* Actions */}
+                        <div className="col-span-2 flex items-center justify-end gap-1">
+                          {variant.stock > 0 ? (
+                            <>
                               <button
                                 onClick={() =>
                                   setQuantities((prev) => ({
@@ -183,7 +350,10 @@ export default function CategoryPage({
                                 onClick={() =>
                                   setQuantities((prev) => ({
                                     ...prev,
-                                    [variant.id]: Math.min(variant.stock, (prev[variant.id] || 0) + 1),
+                                    [variant.id]: Math.min(
+                                      variant.stock,
+                                      (prev[variant.id] || 0) + 1
+                                    ),
                                   }))
                                 }
                                 className="p-1 rounded hover:bg-surface-low"
@@ -193,22 +363,26 @@ export default function CategoryPage({
                               <button
                                 onClick={() => handleAddToCart(product, variant)}
                                 disabled={!quantities[variant.id]}
-                                className="p-2 rounded-lg btn-gradient text-white disabled:opacity-50"
+                                className="p-2 rounded-lg btn-gradient text-white disabled:opacity-50 ml-1"
                               >
                                 <ShoppingCart className="h-4 w-4" />
                               </button>
-                            </div>
+                            </>
+                          ) : (
+                            <span className="text-xs text-red-600 font-medium">
+                              {t("outOfStock")}
+                            </span>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                ))}
               </div>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
-      )}
+      </section>
     </div>
   );
 }

@@ -22,6 +22,7 @@ interface Category {
   nameEl: string;
   slug: string;
   icon: string | null;
+  children?: Category[];
 }
 
 export default function BuyerDashboard() {
